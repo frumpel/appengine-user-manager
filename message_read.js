@@ -51,10 +51,25 @@ function formatUserHash(userHash) {
 	// })
 	// // rs += typeof(users)
 
-	document.getElementsByClassName("output")[0].innerHTML=rs;
+	document.getElementById("usertable").innerHTML=rs;
+};
+
+function openAppTabs(appHash) {
+	var rs = "<H1>Applications to check</H1><P>";
+	var apps = getFirstLevelKeys(appHash);
+	apps.forEach(function(app){
+		rs += app + "<br>"
+		window.setTimeout(function(){chrome.tabs.create({active:false,url:"https://appengine.google.com/permissions?app_id=" + app})},2000);
+	});
+	document.getElementById("apptable").innerHTML=rs;
+
 };
 
 function get_info() {
+	chrome.runtime.sendMessage(
+		{method:'getAppList'}, 
+		openAppTabs
+		);
 	chrome.runtime.sendMessage(
 		{method:'getUserList'}, 
 		formatUserHash
