@@ -1,5 +1,5 @@
 function ae_p_perms_list_users() {
-    
+    var appnm = document.getElementById("ae-appbar-app-id").selectedOptions[0].innerHTML.replace(/\[[^\[\]]*\]/,'').replace(/\s/g,'');
     var table = document.getElementById("ae-admin-dev-table");
 
     if (table != null) {
@@ -12,7 +12,7 @@ function ae_p_perms_list_users() {
                     if (e.length == 4) {
                         var user = e[0].innerHTML.replace(/\s/g,'');
                         console.log(user);
-                        chrome.runtime.sendMessage({method:'userAdd',user:user})
+                        chrome.runtime.sendMessage({method:'userAdd',user:user,application:appnm})
                     }
                 }
             )
