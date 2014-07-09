@@ -36,9 +36,9 @@ function formatUserHash(userHash) {
 		rs += "<tr><td class=email>" + user + "</td>";
 		apps.forEach(function(app){
 			if (userHash[app][user] == true) {
-			  rs += '<td><input type=checkbox value="' + app + ":" + user +'" checked></td>';
+			  rs += '<td><input type=checkbox class="' + app + " " + user +'" checked></td>';
 			} else {
-			  rs += '<td><input type=checkbox value="' + app + ":" + user +'" ></td>';
+			  rs += '<td><input type=checkbox class="' + app + " " + user +'" ></td>';
 			}
 		});
 		rs += "</tr>";
@@ -77,7 +77,10 @@ function closeAppTabs(tabsWindow) {
 };
 
 function updateInfo() {
-		chrome.runtime.sendMessage(
+	chrome.runtime.sendMessage(
+		{method:'clearUserList'}
+		);
+	chrome.runtime.sendMessage(
 		{method:'getAppList'}, 
 		openAppTabs
 		);
