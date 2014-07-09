@@ -27,7 +27,7 @@ function formatUserHash(userHash) {
 	var users = getSecondLevelKeys(userHash);
 
     rs += "<table>";
-    rs += "<tr><th></th>"
+    rs += "<tr><th>" + "apps:" + apps.length + " users:" + users.length + "</th>"
     apps.forEach(function(app){
 		rs += "<th>" + app + "</td>"
 	});
@@ -57,12 +57,13 @@ function formatUserHash(userHash) {
 function openAppTabs(appHash) {
 	var rs = "<H1>Applications to check</H1><P>";
 	var apps = getFirstLevelKeys(appHash);
+	var urls = [];
 	apps.forEach(function(app){
+		urls.push("https://appengine.google.com/permissions?app_id=" + app);
 		rs += app + "<br>"
-		window.setTimeout(function(){chrome.tabs.create({active:false,url:"https://appengine.google.com/permissions?app_id=" + app})},2000);
 	});
 	document.getElementById("apptable").innerHTML=rs;
-
+	chrome.windows.create({focused:false,url:urls},displayKnownInfo);
 };
 
 function updateInfo() {
