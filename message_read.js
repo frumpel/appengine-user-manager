@@ -35,7 +35,11 @@ function formatUserHash(userHash) {
 	users.forEach(function(user){
 		rs += "<tr><td class=email>" + user + "</td>";
 		apps.forEach(function(app){
-			rs += "<td>" + userHash[app][user] + "</td>"
+			if (userHash[app][user] == true) {
+			  rs += '<td><input type=checkbox value="' + app + ":" + user +'" checked></td>';
+			} else {
+			  rs += '<td><input type=checkbox value="' + app + ":" + user +'" ></td>';
+			}
 		});
 		rs += "</tr>";
 	});
@@ -63,7 +67,13 @@ function openAppTabs(appHash) {
 		rs += app + "<br>"
 	});
 	document.getElementById("apptable").innerHTML=rs;
-	chrome.windows.create({focused:false,url:urls},displayKnownInfo);
+	chrome.windows.create({focused:false,url:urls},closeAppTabs);
+};
+
+function closeAppTabs(tabsWindow) {
+	console.log("tabsWindow:" + Object.keys(tabsWindow).toString());
+	displayKnownInfo();
+	window.setTimeout(function(){ chrome.windows.remove(tabsWindow["id"]) },60000);
 };
 
 function updateInfo() {

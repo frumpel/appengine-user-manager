@@ -10,7 +10,8 @@ function ae_p_perms_list_users() {
                 function(entry) {
                     var e = entry.getElementsByTagName("td");
                     if (e.length == 4) {
-                        var user = e[0].innerHTML.replace(/\s/g,'');
+                        // note: this is an mdash, not a dash!
+                        var user = e[0].innerHTML.replace(/—.*/,'').replace(/\s/g,'');
                         console.log(user);
                         chrome.runtime.sendMessage({method:'addUser',"user":user,"application":appnm})
                     }
