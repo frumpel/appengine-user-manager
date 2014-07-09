@@ -65,15 +65,20 @@ function openAppTabs(appHash) {
 
 };
 
-function get_info() {
-	chrome.runtime.sendMessage(
+function updateInfo() {
+		chrome.runtime.sendMessage(
 		{method:'getAppList'}, 
 		openAppTabs
 		);
+}
+
+function displayKnownInfo() {
 	chrome.runtime.sendMessage(
 		{method:'getUserList'}, 
 		formatUserHash
 		);
 };
 
-window.addEventListener('load',get_info);
+window.addEventListener('load',displayKnownInfo);
+document.getElementById('getdata').addEventListener('click',updateInfo);
+
