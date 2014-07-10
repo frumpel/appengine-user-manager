@@ -22,9 +22,9 @@ function getSecondLevelKeys(hash) {
 }
 
 function toggleUsers(toggleSource,toggleEnv,toggleUser) {
-	var checkboxes = document.getElemntsByClassName(toggleUser); // this should also select for prod/nonprod but we don't have that tagged yet
-    for(var ii=0, nn=checkboxes.length; ii<nn;i++) {
-    	checkboxes[ii].checked = source.checked;
+	var checkboxes = document.getElementsByClassName(toggleUser); // this should also select for prod/nonprod but we don't have that tagged yet
+    for(var ii=0, nn=checkboxes.length; ii<nn;ii++) {
+    	checkboxes[ii].checked = toggleSource.checked;
   	};
 };
 
@@ -33,36 +33,56 @@ function formatUserHash(userHash) {
 	var apps = getFirstLevelKeys(userHash);
 	var users = getSecondLevelKeys(userHash);
 
-    rs += "<table>";
-    rs += "<tr><th>" + "apps:" + apps.length + " users:" + users.length + "</th>"
-    apps.forEach(function(app){
-		rs += "<th>" + app + "</td>"
+	var tptr = document.createElement("table");
+	var eptr = null;
+	var trow = tptr.insertRow(-1);
+	var tcel = trow.insertCell(-1);
+	tcel.class = "ch rh";
+	tcel.innerText = "apps:" + apps.length + " users:" + users.length;
+	apps.forEach(function(app){
+		tcel = trow.insertCell(-1);
+		tcel.class = "ch";
+		tcel.innerText = app;
 	});
-	rs += "</tr>";
 	users.forEach(function(user){
-		rs += '<tr><td class=email><input type=checkbox class="toggleprod" onclick=toggleUsers(this,"prod","' + user +'")> ' + user + "</td>";
-		apps.forEach(function(app){
-			if (userHash[app][user] == true) {
-			  rs += '<td><input type=checkbox class="' + app + " " + user +'" checked></td>';
-			} else {
-			  rs += '<td><input type=checkbox class="' + app + " " + user +'" ></td>';
-			}
-		});
-		rs += "</tr>";
-	});
-	rs += "</table>";
-	// apps.forEach(function(app){
-	// 	rs += app.toString() + ": [";
-	// 	// rs += typeof(app);
-	// 	rs += Object.keys(userHash[app]).toString();
-	// 	rs += "]<BR>";
-	// });
-	// users.forEach(function(user){
-	// 	rs += "--" + user.toString() + "--<BR>"
-	// })
-	// // rs += typeof(users)
+		trow = tptr.insertRow(-1);
 
-	document.getElementById("usertable").innerHTML=rs;
+		tcel = trow.insertCell(-1);
+		tcel.class = "rh email";
+
+		eptr = document.createElement("input")
+		eptr.type = "checkbox";
+		eptr.className = "toggle nonprod";
+		eptr.onclick = function(){ toggleUsers(this,"nonprod",user); };
+		eptr.checked = false;
+		tcel.appendChild(eptr);
+
+		eptr = document.createElement("input")
+		eptr.type = "checkbox";
+		eptr.className = "toggle prod";
+		eptr.onclick = function(){ toggleUsers(this,"prod",user); };
+		eptr.checked = false;
+		tcel.appendChild(eptr);
+
+		eptr = document.createTextNode(user);
+		tcel.appendChild(eptr);
+
+		apps.forEach(function(app){
+			tcel = trow.insertCell(-1);
+			// tcel.class = "";
+			eptr = document.createElement("input")
+			eptr.type = "checkbox";
+			eptr.className = app + " " + user; // should have prod/nonprod
+			eptr.checked = (userHash[app][user] == true);
+			tcel.appendChild(eptr);
+		});
+	});
+
+	var usertable = document.getElementById("usertable");
+	while (usertable.firstChild) {
+    	usertable.removeChild(usertable.firstChild);
+	}
+	usertable.appendChild(tptr);
 };
 
 function openAppTabs(appHash) {
