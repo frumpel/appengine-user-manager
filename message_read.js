@@ -72,10 +72,11 @@ function formatUserHash(userHash) {
 			appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "prod" : "nonprod" );
 			tcel = trow.insertCell(-1);
 			// tcel.class = "";
-			eptr = document.createElement("input")
-			eptr.type = "checkbox";
-			eptr.className = app + " " + user + " " + appclass; // should have prod/nonprod
-			eptr.checked = (userHash[app][user] == true);
+			// eptr = document.createElement("input")
+			// eptr.type = "checkbox";
+			// eptr.className = app + " " + user + " " + appclass; // should have prod/nonprod
+			// eptr.checked = (userHash[app][user] == true);
+			eptr = document.createTextNode(userHash[app][user]);
 			tcel.appendChild(eptr);
 		});
 	});

@@ -7,7 +7,7 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
 		if (accessHash[message.application] == undefined) {
 			accessHash[message.application] = {};
 		}
-		accessHash[message.application][message.user] = true;
+		accessHash[message.application][message.user] = message.access;
 	}
 	else if(message.method == 'clearUserList') {
 		accessHash = {};
