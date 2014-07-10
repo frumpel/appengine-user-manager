@@ -43,7 +43,11 @@ function deleteUser(userToDelete) {
 			apps.push(appi.className.replace(userToDelete,"").replace("appselector","").replace(/\s/g,''));
 		}
 	})
-	document.getElementById("messages").innerText="Would delete " + userToDelete + " from " + apps;
+	
+	if (confirm("Would delete " + userToDelete + " from " + apps)) {
+		// document.getElementById("messages").innerText="Would delete " + userToDelete + " from " + apps;
+		openWindowDeleteUser(apps,userToDelete);
+	};
 };
 
 function createOwnershipSelector(selection) {
@@ -130,31 +134,56 @@ function formatUserHash(userHash) {
 	usertable.appendChild(tptr);
 };
 
-function openAppTabs(appHash) {
+function openWindowTabsScraper(appHash) {
 	var rs = "<H1>Applications to check</H1><P>";
 	var apps = getFirstLevelKeys(appHash);
 	var urls = [];
+
+	console.log("Open scraper window " +  apps);
+
 	apps.forEach(function(app){
 		urls.push("https://appengine.google.com/permissions?app_id=" + app);
 		rs += app + "<br>"
 	});
 	document.getElementById("apptable").innerHTML=rs;
-	chrome.windows.create({focused:false,url:urls},closeAppTabs);
+	// chrome.windows.create({focused:false,url:urls},closeWindowTabs);
+	openWindowTabs(urls);
 };
 
-function closeAppTabs(tabsWindow) {
+function openWindowDeleteUser(appArray,userToDelete) {
+	var rs = "<H1>Applications do delete user from</H1><P>";
+	var urls = [];
+	appArray.forEach(function(app){
+		urls.push(
+			"https://appengine.google.com/permissions?app_id=" + encodeURIComponent(app) + 
+			"&rp-user-delete=" + encodeURIComponent(userToDelete));
+		rs += app + "<br>"
+	});
+	document.getElementById("apptable").innerHTML=rs;
+	// chrome.windows.create({focused:false,url:urls});
+	openWindowTabs(urls);
+};
+
+function openWindowTabs(urlList) {
+	console.log("open window " + urlList)
+	chrome.windows.create({focused:false,url:urlList},closeWindowTabs);
+};
+
+function closeWindowTabs(tabsWindow) {
 	console.log("tabsWindow:" + Object.keys(tabsWindow).toString());
 	displayKnownInfo();
-	window.setTimeout(function(){ chrome.windows.remove(tabsWindow["id"]) },60000);
+	window.setTimeout(function(){ chrome.windows.remove(tabsWindow["id"]) },15000);
 };
 
 function updateInfo() {
+	console.log("send message: clear old user list")
 	chrome.runtime.sendMessage(
 		{method:'clearUserList'}
 		);
+	console.log("send message: read list of known apps with callback for scraping")
 	chrome.runtime.sendMessage(
 		{method:'getAppList'}, 
-		openAppTabs
+		openWindowTabsScraper
 		);
 }
 
