@@ -1,3 +1,10 @@
+var odef = [
+	["UNDEFINED","------"],
+	["APP_VIEWER",   "Viewer"],
+	["APP_DEVELOPER","Developer"],
+	["APP_OWNER",    "Owner"],
+];
+
 function sortAlphabetically(a,b) {
 	return a.toLowerCase().localeCompare(b.toLowerCase())
 };
@@ -28,6 +35,30 @@ function toggleUsers(toggleSource,toggleEnv,toggleUser) {
   	};
 };
 
+function deleteUser(userToDelete) {
+	var appa = Array.prototype.slice.call(document.getElementsByClassName(userToDelete + " appselector"));
+	var apps = [];
+	appa.forEach(function(appi){
+		if (appi.selectedIndex > 0) {
+			apps.push(appi.className.replace(userToDelete,"").replace("appselector","").replace(/\s/g,''));
+		}
+	})
+	document.getElementById("messages").innerText="Would delete " + userToDelete + " from " + apps;
+};
+
+function createOwnershipSelector(selection) {
+
+	var tptr = document.createElement("select");
+	odef.forEach(function attachOption(info) {
+		var option = document.createElement("option");
+		option.value = info[0];
+		option.text = info[1];
+		option.selected = (selection == info[0]);
+		tptr.appendChild(option);
+	});
+	return tptr;
+};
+
 function formatUserHash(userHash) {
 	var rs = "<H1>Appengine Users</H1><P>";
 	var apps = getFirstLevelKeys(userHash);
@@ -51,7 +82,13 @@ function formatUserHash(userHash) {
 		tcel = trow.insertCell(-1);
 		tcel.class = "rh email";
 
-		eptr = document.createElement("input")
+		eptr = document.createElement("button");
+		eptr.appendChild(document.createTextNode("DELETE"));
+		eptr.className = "delete " + user;
+		eptr.onclick = function(){ deleteUser(user); };
+		tcel.appendChild(eptr);
+
+		eptr = document.createElement("input");
 		eptr.type = "checkbox";
 		eptr.className = "toggle nonprod";
 		eptr.onclick = function(){ toggleUsers(this,"nonprod",user); };
@@ -76,7 +113,12 @@ function formatUserHash(userHash) {
 			// eptr.type = "checkbox";
 			// eptr.className = app + " " + user + " " + appclass; // should have prod/nonprod
 			// eptr.checked = (userHash[app][user] == true);
-			eptr = document.createTextNode(userHash[app][user]);
+
+			// eptr = document.createTextNode(userHash[app][user]);
+
+			eptr = createOwnershipSelector(userHash[app][user]);
+			eptr.className = user + " " + app + " " + "appselector";
+
 			tcel.appendChild(eptr);
 		});
 	});
@@ -125,4 +167,5 @@ function displayKnownInfo() {
 
 window.addEventListener('load',displayKnownInfo);
 document.getElementById('getdata').addEventListener('click',updateInfo);
+
 
