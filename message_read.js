@@ -22,7 +22,7 @@ function getSecondLevelKeys(hash) {
 }
 
 function toggleUsers(toggleSource,toggleEnv,toggleUser) {
-	var checkboxes = document.getElementsByClassName(toggleUser); // this should also select for prod/nonprod but we don't have that tagged yet
+	var checkboxes = document.getElementsByClassName(toggleUser + " " + toggleEnv);
     for(var ii=0, nn=checkboxes.length; ii<nn;ii++) {
     	checkboxes[ii].checked = toggleSource.checked;
   	};
@@ -31,6 +31,7 @@ function toggleUsers(toggleSource,toggleEnv,toggleUser) {
 function formatUserHash(userHash) {
 	var rs = "<H1>Appengine Users</H1><P>";
 	var apps = getFirstLevelKeys(userHash);
+	var appclass = "";
 	var users = getSecondLevelKeys(userHash);
 
 	var tptr = document.createElement("table");
@@ -68,11 +69,12 @@ function formatUserHash(userHash) {
 		tcel.appendChild(eptr);
 
 		apps.forEach(function(app){
+			appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "prod" : "nonprod" );
 			tcel = trow.insertCell(-1);
 			// tcel.class = "";
 			eptr = document.createElement("input")
 			eptr.type = "checkbox";
-			eptr.className = app + " " + user; // should have prod/nonprod
+			eptr.className = app + " " + user + " " + appclass; // should have prod/nonprod
 			eptr.checked = (userHash[app][user] == true);
 			tcel.appendChild(eptr);
 		});
