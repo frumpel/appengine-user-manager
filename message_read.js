@@ -21,6 +21,13 @@ function getSecondLevelKeys(hash) {
 	return Object.keys(keys2).sort(sortAlphabetically);
 }
 
+function toggleUsers(toggleSource,toggleEnv,toggleUser) {
+	var checkboxes = document.getElemntsByClassName(toggleUser); // this should also select for prod/nonprod but we don't have that tagged yet
+    for(var ii=0, nn=checkboxes.length; ii<nn;i++) {
+    	checkboxes[ii].checked = source.checked;
+  	};
+};
+
 function formatUserHash(userHash) {
 	var rs = "<H1>Appengine Users</H1><P>";
 	var apps = getFirstLevelKeys(userHash);
@@ -33,7 +40,7 @@ function formatUserHash(userHash) {
 	});
 	rs += "</tr>";
 	users.forEach(function(user){
-		rs += "<tr><td class=email>" + user + "</td>";
+		rs += '<tr><td class=email><input type=checkbox class="toggleprod" onclick=toggleUsers(this,"prod","' + user +'")> ' + user + "</td>";
 		apps.forEach(function(app){
 			if (userHash[app][user] == true) {
 			  rs += '<td><input type=checkbox class="' + app + " " + user +'" checked></td>';
