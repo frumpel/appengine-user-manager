@@ -56,6 +56,9 @@ function deleteUser(userToDelete) {
 	};
 };
 
+function addUser(userToAdd) {
+	alert("Would add user " + userToAdd);
+}
 function createOwnershipSelector(selection) {
 
 	var tptr = document.createElement("select");
@@ -77,6 +80,8 @@ function formatUserHash(userHash) {
 
 	var tptr = document.createElement("table");
 	var eptr = null;
+
+	// Header
 	var trow = tptr.insertRow(-1);
 	var tcel = trow.insertCell(-1);
 	tcel.className = "ch rh";
@@ -87,6 +92,8 @@ function formatUserHash(userHash) {
 		tcel.className = "ch " + appclass;
 		tcel.innerText = app;
 	});
+
+	// Existing Users
 	users.forEach(function(user){
 
 		trow = tptr.insertRow(-1);
@@ -138,6 +145,29 @@ function formatUserHash(userHash) {
 			tcel.appendChild(eptr);
 		});
 	});
+
+	// Footer
+	trow = tptr.insertRow(-1);
+	tcel = trow.insertCell(-1);
+	tcel.className = "ch rf";
+
+	eptr = document.createElement("button");
+	eptr.appendChild(document.createTextNode("ADD"));
+	eptr.className = "add";
+	eptr.onclick = function(){ addUser("tbd"); };
+	tcel.appendChild(eptr);
+
+	eptr = document.createElement("input");
+	eptr.type = "text";
+	eptr.id = "rp-adduser"
+	tcel.appendChild(eptr);
+     
+	apps.forEach(function(app){
+		appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "prod" : "nonprod" );
+		tcel = trow.insertCell(-1);
+		tcel.className = "cf " + appclass;
+	});
+
 
 	var usertable = document.getElementById("usertable");
 	while (usertable.firstChild) {

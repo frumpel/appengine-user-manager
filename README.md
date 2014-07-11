@@ -5,6 +5,11 @@ List / manage users with appengine access
 
 We have 10s of appengine projects (microservices) and 10s of users with need to access them in various ways. Occasionally new users come and old users leave. Hundreds of clicks later we might or might not have the appropriate access controls. Google is promising that a better way of implementing access controls is on their roadmap but until then ... this chrome extension tries to make the chore more manageable. 
 
+Disclaimer
+----------
+
+Use entirely at your own risk! This could very well do bad things to your account setup! For this to be useful you need to run this as a privileged user so you can do privileged damage. You've been warned.
+
 Installation
 ------------
 
