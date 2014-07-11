@@ -1,0 +1,27 @@
+body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 75%;
+}
+
+table {
+        border-collapse: collapse;
+        border: 1px solid black;
+}
+
+tr:nth-child(1) {
+        background-color: #ddd !important;
+}
+
+tr:not(:nth-child(1)) td:nth-child(1) {
+        background-color: #eee;
+}
+
+td {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        padding: 0.75em;
+}
+
+td:not(:nth-child(1)) {
+        text-align: center;
+}
