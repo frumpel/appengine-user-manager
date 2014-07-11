@@ -8,13 +8,39 @@ table {
         border: 1px solid black;
 }
 
+.error {
+        color: red;
+}
+
 tr:nth-child(1) {
         background-color: #ddd !important;
 }
 
+tr:nth-child(1) td.prod {
+        background-color: #faa !important;
+}
+
+tr:nth-child(2n+1) {
+        background-color: #fff;
+}
+
+tr:nth-child(2n+1) td.prod {
+        background-color: #fee;
+}
+
+tr:not(:nth-child(2n+1)) {
+        background-color: #eee;
+}
+
+tr:not(:nth-child(2n+1)) td.prod {
+        background-color: #fdd;
+}
+
+/*
 tr:not(:nth-child(1)) td:nth-child(1) {
         background-color: #eee;
 }
+*/
 
 td {
         border-top: 1px solid black;

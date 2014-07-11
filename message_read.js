@@ -5,6 +5,12 @@ var odef = [
 	["APP_OWNER",    "Owner"],
 ];
 
+var okDomains = [
+	"smarttech.com",
+	"smarttechuat.com",
+	"smartwizardschool.com",
+];
+
 function sortAlphabetically(a,b) {
 	return a.toLowerCase().localeCompare(b.toLowerCase())
 };
@@ -73,18 +79,23 @@ function formatUserHash(userHash) {
 	var eptr = null;
 	var trow = tptr.insertRow(-1);
 	var tcel = trow.insertCell(-1);
-	tcel.class = "ch rh";
+	tcel.className = "ch rh";
 	tcel.innerText = "apps:" + apps.length + " users:" + users.length;
 	apps.forEach(function(app){
+		appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "prod" : "nonprod" );
 		tcel = trow.insertCell(-1);
-		tcel.class = "ch";
+		tcel.className = "ch " + appclass;
 		tcel.innerText = app;
 	});
 	users.forEach(function(user){
+
 		trow = tptr.insertRow(-1);
+		if (okDomains.indexOf(user.replace(/^.*@/,'')) == -1) {
+			trow.className = "error";
+		}
 
 		tcel = trow.insertCell(-1);
-		tcel.class = "rh email";
+		tcel.className = "rh email";
 
 		eptr = document.createElement("button");
 		eptr.appendChild(document.createTextNode("DELETE"));
@@ -112,7 +123,8 @@ function formatUserHash(userHash) {
 		apps.forEach(function(app){
 			appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "prod" : "nonprod" );
 			tcel = trow.insertCell(-1);
-			// tcel.class = "";
+			tcel.className = appclass;
+			// tcel.className = "";
 			// eptr = document.createElement("input")
 			// eptr.type = "checkbox";
 			// eptr.className = app + " " + user + " " + appclass; // should have prod/nonprod
@@ -172,7 +184,7 @@ function openWindowTabs(urlList) {
 function closeWindowTabs(tabsWindow) {
 	console.log("tabsWindow:" + Object.keys(tabsWindow).toString());
 	displayKnownInfo();
-	window.setTimeout(function(){ chrome.windows.remove(tabsWindow["id"]) },15000);
+	window.setTimeout(function(){ chrome.windows.remove(tabsWindow["id"]) },60000);
 };
 
 function updateInfo() {
