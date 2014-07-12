@@ -53,7 +53,7 @@ function deleteUser(userToDelete) {
 
 	appa.forEach(function(appi){
 		if (appi.selectedIndex > 0) {
-			apps.push(appi.className.replace(userToDelete,"").replace("APPSELECTOR","").replace(/\s/g,''));
+			apps.push(appi.className.replace(userToDelete,"").replace(/(APPSELECTOR|(NON)?PROD)/g,"").replace(/\s/g,''));
 		}
 	});
 	
