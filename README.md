@@ -29,3 +29,8 @@ The UX is still rather rough and so far only the overview and DELETE functionali
     * each of the tabs runs its content script and populates the background store
   * there is a setTimeout that will close the new window after 60s. If you find that you are not getting all the results you expect try adjusting the wait time
 * reload the dashboard 
+
+A note on naming conventions / assumptions:
+
+* The highlighting / CSS logic assumes that you have your projects named APPNAME-(...|prod) and you will get different highlights for prod vs non-prod projects
+* There is the assumption that you have preferred email domains. As such there is variable named "okDomains" with list of accepted domains in message_read.js. Season to taste
