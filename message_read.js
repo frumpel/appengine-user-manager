@@ -35,18 +35,19 @@ function getSecondLevelKeys(hash) {
 }
 
 function toggleUsers(toggleSource,toggleEnv,toggleUser) {
-	var checkboxes = document.getElementsByClassName(toggleUser + " " + toggleEnv);
-    for(var ii=0, nn=checkboxes.length; ii<nn;ii++) {
-    	checkboxes[ii].checked = toggleSource.checked;
+	console.log("toggle users " + toggleSource + " " + toggleUser + " " + toggleEnv);
+	var selections = document.getElementsByClassName(toggleUser + " " + toggleEnv + " APPSELECTOR");
+    for(var ii=0, nn=selections.length; ii<nn;ii++) {
+    	selections[ii].value = toggleSource.value;
   	};
 };
 
 function deleteUser(userToDelete) {
-	var appa = Array.prototype.slice.call(document.getElementsByClassName(userToDelete + " appselector"));
+	var appa = Array.prototype.slice.call(document.getElementsByClassName(userToDelete + " APPSELECTOR"));
 	var apps = [];
 	appa.forEach(function(appi){
 		if (appi.selectedIndex > 0) {
-			apps.push(appi.className.replace(userToDelete,"").replace("appselector","").replace(/\s/g,''));
+			apps.push(appi.className.replace(userToDelete,"").replace("APPSELECTOR","").replace(/\s/g,''));
 		}
 	})
 	
@@ -57,8 +58,26 @@ function deleteUser(userToDelete) {
 };
 
 function addUser(userToAdd) {
-	alert("Would add user " + userToAdd);
-}
+	var appa = Array.prototype.slice.call(document.getElementsByClassName("ADDUSER APPSELECTOR"));
+	var apph = {};
+	var appn = "";
+
+	appa.forEach(function(appi){
+		if (appi.value != "UNDEFINED") {
+			appn = appi.className.replace(/(ADDUSER|APPSELECTOR|(NON)?PROD)/g,"").replace(/\s/g,'')
+			apph[appn] = appi.value;
+		}
+	})
+
+	var rs = "Add user  " + userToAdd.value +"\n";
+	Object.keys(apph).forEach(function(key) {
+		rs += key + ":" + apph[key] + "\n";
+	});
+	if (confirm(rs)) {
+		openWindowAddUser(apph,userToAdd.value);
+	}
+};
+
 function createOwnershipSelector(selection) {
 
 	var tptr = document.createElement("select");
@@ -87,7 +106,7 @@ function formatUserHash(userHash) {
 	tcel.className = "ch rh";
 	tcel.innerText = "apps:" + apps.length + " users:" + users.length;
 	apps.forEach(function(app){
-		appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "prod" : "nonprod" );
+		appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "PROD" : "NONPROD" );
 		tcel = trow.insertCell(-1);
 		tcel.className = "ch " + appclass;
 		tcel.innerText = app;
@@ -110,25 +129,21 @@ function formatUserHash(userHash) {
 		eptr.onclick = function(){ deleteUser(user); };
 		tcel.appendChild(eptr);
 
-		eptr = document.createElement("input");
-		eptr.type = "checkbox";
-		eptr.className = "toggle nonprod";
-		eptr.onclick = function(){ toggleUsers(this,"nonprod",user); };
-		eptr.checked = false;
+		eptr = createOwnershipSelector(0);
+		eptr.className = "toggle NONPROD " + user;
+		eptr.onchange = function(){ toggleUsers(this,"NONPROD",user)};
 		tcel.appendChild(eptr);
 
-		eptr = document.createElement("input")
-		eptr.type = "checkbox";
-		eptr.className = "toggle prod";
-		eptr.onclick = function(){ toggleUsers(this,"prod",user); };
-		eptr.checked = false;
+		eptr = createOwnershipSelector(0);
+		eptr.className = "toggle PROD " + user;
+		eptr.onchange = function(){ toggleUsers(this,"PROD",user)};
 		tcel.appendChild(eptr);
 
 		eptr = document.createTextNode(user);
 		tcel.appendChild(eptr);
 
 		apps.forEach(function(app){
-			appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "prod" : "nonprod" );
+			appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "PROD" : "NONPROD" );
 			tcel = trow.insertCell(-1);
 			tcel.className = appclass;
 			// tcel.className = "";
@@ -140,7 +155,7 @@ function formatUserHash(userHash) {
 			// eptr = document.createTextNode(userHash[app][user]);
 
 			eptr = createOwnershipSelector(userHash[app][user]);
-			eptr.className = user + " " + app + " " + "appselector";
+			eptr.className = user + " " + app + " " + "APPSELECTOR" + " " + appclass;
 
 			tcel.appendChild(eptr);
 		});
@@ -151,21 +166,37 @@ function formatUserHash(userHash) {
 	tcel = trow.insertCell(-1);
 	tcel.className = "ch rf";
 
+	var xptr = document.createElement("input");
+	xptr.type = "text";
+	xptr.id = "rp-adduser"
+
 	eptr = document.createElement("button");
 	eptr.appendChild(document.createTextNode("ADD"));
 	eptr.className = "add";
-	eptr.onclick = function(){ addUser("tbd"); };
+	eptr.onclick = function(){ addUser(xptr); };
 	tcel.appendChild(eptr);
 
-	eptr = document.createElement("input");
-	eptr.type = "text";
-	eptr.id = "rp-adduser"
+	eptr = createOwnershipSelector(0);
+	eptr.className = "toggle NONPROD ADDUSER";
+	eptr.onchange = function(){ toggleUsers(this,"NONPROD","ADDUSER")};
 	tcel.appendChild(eptr);
+
+	eptr = createOwnershipSelector(0);
+	eptr.className = "toggle PROD ADDUSER";
+	eptr.onchange = function(){ toggleUsers(this,"PROD","ADDUSER")};
+	tcel.appendChild(eptr);
+
+	tcel.appendChild(xptr);
      
 	apps.forEach(function(app){
-		appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "prod" : "nonprod" );
+		appclass = ((app.replace(/^.*-prod$/,"prod") == "prod") ? "PROD" : "NONPROD" );
 		tcel = trow.insertCell(-1);
 		tcel.className = "cf " + appclass;
+
+		eptr = createOwnershipSelector(0);
+		eptr.className = "ADDUSER" + " " + app + " " + "APPSELECTOR" + " " + appclass;
+
+		tcel.appendChild(eptr);
 	});
 
 
@@ -205,6 +236,26 @@ function openWindowDeleteUser(appArray,userToDelete) {
 	// chrome.windows.create({focused:false,url:urls});
 	openWindowTabs(urls);
 };
+
+function openWindowAddUser(appHash,userToAdd) {
+	var rs = "<H1>Applications do add user to</H1><P>";
+	var urls = [];
+
+	console.log("openWindowAddUser: args: " + userToAdd)
+	console.log("openWindowAddUser: args: " + appHash)
+	console.log("openWindowAddUser: args: " + Object.keys(appHash))
+
+	Object.keys(appHash).forEach(function(app) {
+		urls.push(
+			"https://appengine.google.com/permissions?app_id=" + encodeURIComponent(app) + 
+			"&rp-user-add=" + encodeURIComponent(userToAdd + ":" + appHash[app]));
+		rs += app + ":" + appHash[app] + "<BR>";
+	});
+	document.getElementById("apptable").innerHTML=rs;
+	// chrome.windows.create({focused:false,url:urls});
+	openWindowTabs(urls);
+};
+
 
 function openWindowTabs(urlList) {
 	console.log("open window " + urlList)

@@ -16,7 +16,7 @@ tr:nth-child(1) {
         background-color: #ddd !important;
 }
 
-tr:nth-child(1) td.prod {
+tr:nth-child(1) td.PROD {
         background-color: #faa !important;
 }
 
@@ -24,7 +24,7 @@ tr:nth-child(2n+1) {
         background-color: #fff;
 }
 
-tr:nth-child(2n+1) td.prod {
+tr:nth-child(2n+1) td.PROD {
         background-color: #fee;
 }
 
@@ -32,7 +32,7 @@ tr:not(:nth-child(2n+1)) {
         background-color: #eee;
 }
 
-tr:not(:nth-child(2n+1)) td.prod {
+tr:not(:nth-child(2n+1)) td.PROD {
         background-color: #fdd;
 }
 

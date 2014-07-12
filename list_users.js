@@ -38,13 +38,13 @@ function ae_p_user_delete() {
     var getargs = window.location.search.substr(1).split("&");
     var deleteUser = undefined;
 
-    console.log("args: " + getargs)
+    console.log("delete user: args: " + getargs)
     for (var ii=0; ii<getargs.length; ii++) {
         if (getargs[ii].match(/^rp-user-delete=/)) {
             deleteUser = decodeURIComponent(getargs[ii].replace(/^rp-user-delete=/,''));
         }
     }
-    console.log("delete user: " + deleteUser)
+    console.log("delete user params: " + deleteUser)
 
     // if (deleteUser) {
     //    alert("Will delete " + deleteUser);
@@ -82,7 +82,39 @@ function ae_p_user_delete() {
 //       // setTimeout(function() { window.close(); },5000);
 };
 
+
+function ae_p_user_add() {
+    var getargs = window.location.search.substr(1).split("&");
+    var addUser = undefined;
+    var addType = undefined;
+
+    console.log("add user: args: " + getargs)
+    for (var ii=0; ii<getargs.length; ii++) {
+        if (getargs[ii].match(/^rp-user-add=/)) {
+            addUser = decodeURIComponent(getargs[ii]).replace(/^rp-user-add=/,'').replace(/:.*$/,'');
+            addType = decodeURIComponent(getargs[ii]).replace(/^rp-user-add=/,'').replace(/^.*:/,'');
+        }
+        else {
+            console.log("Could not match " + getargs[ii])
+        }
+    }
+    console.log("add user params: " + addUser + " with type " + addType)
+
+    if ((addUser != undefined) && (addType != undefined)) {
+        document.getElementById("new_admin").value=addUser;
+        document.getElementById("ae-admin-dev-role-new").value=addType;
+        document.getElementsByClassName("ae-form")[0].submit()
+    }
+
+    // this is a large amount of code replication with ae_p_perms_
+//       // // Once we cliced the button we will either get an error or a 302 to
+//       // // the version page. Either way we want to close the window. Do so
+//       // // after a sensible timeout
+//       // setTimeout(function() { window.close(); },5000);
+};
+
 ae_p_perms_list_users();
 ae_p_perms_list_apps();
 ae_p_user_delete();
+ae_p_user_add();
 //alert("loaded")
