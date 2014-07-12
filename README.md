@@ -5,6 +5,10 @@ List / manage users with appengine access
 
 We have 10s of appengine projects (microservices) and 10s of users with need to access them in various ways. Occasionally new users come and old users leave. Hundreds of clicks later we might or might not have the appropriate access controls. Google is promising that a better way of implementing access controls is on their roadmap but until then ... this chrome extension tries to make the chore more manageable. 
 
+![Screenshot](https://raw.githubusercontent.com/frumpel/appengine-user-manager/master/screenshot.png)
+
+Currently you can add and delete users. Changing of permissions is on my wishlist.
+
 Disclaimer
 ----------
 
@@ -18,7 +22,7 @@ This is a chrome extension - download the whole folder, enable developer mode in
 Usage
 -----
 
-The UX is still rather rough and so far only the overview and DELETE functionality is implemented. The current process to get to the overview stage is:
+The UX is still rather rough and so far only the overview, ADD and DELETE functionality is implemented. The current process to get to the overview stage is:
 
 * open your appengine dashboard on the permissions tab
   * the content script runs and passes the list of avalaible projects to the background store
