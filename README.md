@@ -7,8 +7,6 @@ We have 10s of appengine projects (microservices) and 10s of users with need to 
 
 ![Screenshot](https://raw.githubusercontent.com/frumpel/appengine-user-manager/master/screenshot.png)
 
-Currently you can add and delete users. Changing of permissions is on my wishlist.
-
 Disclaimer
 ----------
 
@@ -22,7 +20,7 @@ This is a chrome extension - download the whole folder, enable developer mode in
 Usage
 -----
 
-The UX is still rather rough and so far only the overview, ADD and DELETE functionality is implemented. The current process to get to the overview stage is:
+The UX is workable but there are a few idiosyncracies left. The current process to get to the overview stage is:
 
 * open your appengine dashboard on the permissions tab
   * the content script runs and passes the list of avalaible projects to the background store
@@ -32,7 +30,7 @@ The UX is still rather rough and so far only the overview, ADD and DELETE functi
   * this will open a new window with a tab with the permissions page for every project you have. In parallel. This will max out your CPU and still take a long time. 
     * each of the tabs runs its content script and populates the background store
   * there is a setTimeout that will close the new window after 60s. If you find that you are not getting all the results you expect try adjusting the wait time
-* reload the dashboard 
+* reload the dashboard tab
 
 A note on naming conventions / assumptions:
 
