@@ -269,7 +269,7 @@ function createOwnershipSelector(selection) {
 }
 
 function formatUserHash(userHash) {
-	var apps, appclass, users, tptr, eptr, xptr, trow, tcel, usertable;
+	var apps, appclass, users, tptr, eptr, xptr, trow, tcel, usertable, jsonoutput;
 
     accessHash = userHash; // is this safe? Will the data be retained?
 
@@ -391,6 +391,9 @@ function formatUserHash(userHash) {
     	usertable.removeChild(usertable.firstChild);
 	}
 	usertable.appendChild(tptr);
+
+	jsonoutput = document.getElementById("jsonoutput");
+	jsonoutput.innerHTML = "<pre>" + JSON.stringify(accessHash,undefined,2) + "</pre>";
 }
 
 
