@@ -1,3 +1,14 @@
+// List of domains we accept in emails
+var okDomains = [
+	"smarttech.com",
+	"smarttechuat.com",
+	"smartwizardschool.com",
+	"gserviceaccount.com",
+	"appspot.gserviceaccount.com"
+];
+
+// Global variables - don't touch ----------------------------------------------
+
 var odef = [
 	["UNDEFINED","------"],
 	["APP_VIEWER",   "Viewer"],
@@ -5,11 +16,9 @@ var odef = [
 	["APP_OWNER",    "Owner"]
 ];
 
-var okDomains = [
-	"smarttech.com",
-	"smarttechuat.com",
-	"smartwizardschool.com"
-];
+var accessHash = {}; // a local copy of known info ... populated by formatUserHash
+
+// Utility functions -----------------------------------------------------------
 
 function sortAlphabetically(a,b) {
 	return a.toLowerCase().localeCompare(b.toLowerCase());
@@ -35,6 +44,102 @@ function getSecondLevelKeys(hash) {
 	return Object.keys(keys2).sort(sortAlphabetically);
 }
 
+// URL formatters --------------------------------------------------------------
+
+function createScraperURL(app) {
+	return "https://appengine.google.com/permissions?" + 
+		"app_id=" + encodeURIComponent(app);
+}
+
+function createAddURL(app,userToAdd,userPermissions) {
+	return "https://appengine.google.com/permissions?" +
+		"app_id=" + encodeURIComponent(app) + 
+		"&rp-user-add=" + encodeURIComponent(userToAdd + ":" + userPermissions);
+}
+
+function createDeleteURL(app,userToDelete) {
+	return "https://appengine.google.com/permissions?" +
+		"app_id=" + encodeURIComponent(app) + 
+		"&rp-user-delete=" + encodeURIComponent(userToDelete);
+}
+
+function createFixURL(app,userToFix,userPermissions) {
+	return "https://appengine.google.com/permissions?" +
+		"app_id=" + encodeURIComponent(app) + 
+		"&rp-user-fix=" + encodeURIComponent(userToFix + ":" + userPermissions);
+}
+
+// tab/window handlers ---------------------------------------------------------
+
+
+
+// function openWindowDeleteUser(appArray,userToDelete) {
+// 	var rs, urls;
+
+// 	rs = "<H1>Applications do delete user from</H1><P>";
+// 	urls = [];
+
+// 	appArray.forEach(function(app){
+// 		urls.push(createDeleteURL(app,userToDelete));
+// 		rs += app + "<br>";
+// 	});
+// 	document.getElementById("apptable").innerHTML=rs;
+// 	openWindowTabs(urls);
+// }
+
+// function openWindowAddUser(appHash,userToAdd) {
+// 	var rs, urls;
+
+// 	rs = "<H1>Applications to add user to</H1><P>";
+// 	urls = [];
+
+// 	console.log("openWindowAddUser: args: " + userToAdd);
+// 	console.log("openWindowAddUser: args: " + appHash);
+// 	console.log("openWindowAddUser: args: " + Object.keys(appHash));
+
+// 	Object.keys(appHash).forEach(function(app) {
+// 		urls.push(createAddURL(app,userToAdd,appHash[app]));
+// 		rs += app + ":" + appHash[app] + "<BR>";
+// 	});
+// 	document.getElementById("apptable").innerHTML=rs;
+// 	openWindowTabs(urls);
+// }
+
+// function openWindowFixUser(appHash,userToAdd) {
+// 	var rs, urls;
+
+// 	rs = "<H1>Applications to fix user in</H1><P>";
+// 	urls = [];
+
+// 	console.log("openWindowFixUser: args: " + userToAdd);
+// 	console.log("openWindowFixUser: args: " + appHash);
+// 	console.log("openWindowFixUser: args: " + Object.keys(appHash));
+
+// 	Object.keys(appHash).forEach(function(app) {
+// 		urls.push(
+// 			"https://appengine.google.com/permissions?app_id=" + encodeURIComponent(app) + 
+// 			"&rp-user-fix=" + encodeURIComponent(userToAdd + ":" + appHash[app]));
+// 		rs += app + ":" + appHash[app] + "<BR>";
+// 	});
+// 	document.getElementById("apptable").innerHTML=rs;
+// 	// chrome.windows.create({focused:false,url:urls});
+// 	openWindowTabs(urls);
+// }
+
+function openWindowTabs(urlList) {
+	console.log("open window with tabs:");
+	urlList.forEach(function(entry) { console.log(entry); } );
+	chrome.windows.create({focused:false,url:urlList},closeWindowTabs);
+}
+
+function closeWindowTabs(tabsWindow) {
+	console.log("tabsWindow:" + Object.keys(tabsWindow).toString());
+	displayKnownInfo();
+	window.setTimeout(function(){ chrome.windows.remove(tabsWindow["id"]); },60000);
+}
+
+// click handlers --------------------------------------------------------------
+
 function toggleUsers(toggleSource,toggleEnv,toggleUser) {
 	var selections, ii, nn;
 
@@ -45,46 +150,110 @@ function toggleUsers(toggleSource,toggleEnv,toggleUser) {
   	}
 }
 
+function scrapeInfo(appHash) {
+	var rs, apps, urls;
+
+	rs = "<H1>Applications to check</H1><P>";
+	apps = getFirstLevelKeys(appHash);
+	urls = [];
+
+	console.log("Open scraper window " +  apps);
+
+	apps.forEach(function(app){
+		urls.push(createScraperURL(app));
+		rs += app + "<br>";
+	});
+	document.getElementById("apptable").innerHTML=rs;
+	openWindowTabs(urls);
+}
 function deleteUser(userToDelete) {
-	var appa, apps;
+	var appa, apps, appn, urls;
 
 	appa = Array.prototype.slice.call(document.getElementsByClassName(userToDelete + " APPSELECTOR"));
 	apps = [];
+	urls = [];
 
 	appa.forEach(function(appi){
 		if (appi.selectedIndex > 0) {
-			apps.push(appi.className.replace(userToDelete,"").replace(/(APPSELECTOR|(NON)?PROD)/g,"").replace(/\s/g,''));
+			appn = appi.className.replace(userToDelete,"").replace(/(APPSELECTOR|(NON)?PROD)/g,"").replace(/\s/g,'');
+			apps.push(appn);
+			urls.push(createDeleteURL(appn,userToDelete));
 		}
 	});
 	
 	if (confirm("Would delete " + userToDelete + " from " + apps)) {
 		// document.getElementById("messages").innerText="Would delete " + userToDelete + " from " + apps;
-		openWindowDeleteUser(apps,userToDelete);
+		openWindowTabs(urls);
 	}
 }
 
-function addUser(userToAdd) {
-	var appa, apph, appn, rs;
+function addUser(userToAddInput) {
+	var appa, appn, rs, urls, userToAdd;
 
 	appa = Array.prototype.slice.call(document.getElementsByClassName("ADDUSER APPSELECTOR"));
-	apph = {};
 	appn = "";
+	urls = [];
+	userToAdd = userToAddInput.value;
 
+	rs = "Add user  " + userToAdd + "\n";
 	appa.forEach(function(appi){
 		if (appi.value != "UNDEFINED") {
 			appn = appi.className.replace(/(ADDUSER|APPSELECTOR|(NON)?PROD)/g,"").replace(/\s/g,'');
-			apph[appn] = appi.value;
+			rs += appn + ":" + appi.value + "\n";
+			urls.push(createAddURL(appn,userToAdd,appi.value))
 		}
 	});
 
-	rs = "Add user  " + userToAdd.value +"\n";
-	Object.keys(apph).forEach(function(key) {
-		rs += key + ":" + apph[key] + "\n";
-	});
 	if (confirm(rs)) {
-		openWindowAddUser(apph,userToAdd.value);
+		openWindowTabs(urls);
 	}
 }
+
+function fixUser(userToFix) {
+	var appa, apph, appn, rs, urls;
+
+	appa = Array.prototype.slice.call(document.getElementsByClassName("APPSELECTOR " + userToFix));
+	apph = {};
+	appn = "";
+	urls = [];
+
+    apps = getFirstLevelKeys(accessHash);
+
+    rs = "Fix user  " + userToFix + "\n";
+	appa.forEach(function(appi){
+		// console.log("userToFix: " + userToFix);
+		// console.log("appi.classname: " + appi.className);
+		appn = appi.className.replace(/(ADDUSER|APPSELECTOR|(NON)?PROD)/g,"").replace(userToFix,'').replace(/\s/g,'');
+		// console.log("appn: " + appn)
+		pcur = (typeof(accessHash[appn][userToFix]) == "undefined" ? "UNDEFINED" : accessHash[appn][userToFix]);
+		pnew = (typeof(appi.value                 ) == "undefined" ? "UNDEFINED" : appi.value                 );
+
+		console.log("Fix user: " + pcur + " to " + pnew)
+		if (pnew != pcur) {
+			if (pnew == "UNDEFINED") { 
+				console.log(" ... DELETE");
+				urls.push(createDeleteURL(appn,userToFix));
+				rs += "delete:" + userToFix + ":" + appn + "\n";
+			}
+			else if (pcur == "UNDEFINED") {
+				console.log(" ... ADD");
+				urls.push(createAddURL(appn,userToFix,pnew));				
+				rs += "add:" + userToFix + ":" + appn + ":" + pnew + "\n";
+			}
+			else {
+				console.log(" ... MODIFY")
+				urls.push(createFixURL(appn,userToFix,pnew));
+				rs += "modify:" + userToFix + ":" + appn + ":" + pnew + "\n";
+			}
+		}
+	});
+
+	if (confirm(rs)) {
+		openWindowTabs(urls);
+	}	
+}
+
+// Data formatters / document content ------------------------------------------
 
 function createOwnershipSelector(selection) {
 
@@ -101,6 +270,8 @@ function createOwnershipSelector(selection) {
 
 function formatUserHash(userHash) {
 	var apps, appclass, users, tptr, eptr, xptr, trow, tcel, usertable;
+
+    accessHash = userHash; // is this safe? Will the data be retained?
 
 	apps = getFirstLevelKeys(userHash);
 	appclass = "";
@@ -136,6 +307,12 @@ function formatUserHash(userHash) {
 		eptr.appendChild(document.createTextNode("DELETE"));
 		eptr.className = "delete " + user;
 		eptr.onclick = function(){ deleteUser(user); };
+		tcel.appendChild(eptr);
+
+		eptr = document.createElement("button");
+		eptr.appendChild(document.createTextNode("FIX"));
+		eptr.className = "fix " + user;
+		eptr.onclick = function(){ fixUser(user); };
 		tcel.appendChild(eptr);
 
 		eptr = createOwnershipSelector(0);
@@ -216,73 +393,9 @@ function formatUserHash(userHash) {
 	usertable.appendChild(tptr);
 }
 
-function openWindowTabsScraper(appHash) {
-	var rs, apps, urls;
-
-	rs = "<H1>Applications to check</H1><P>";
-	apps = getFirstLevelKeys(appHash);
-	urls = [];
-
-	console.log("Open scraper window " +  apps);
-
-	apps.forEach(function(app){
-		urls.push("https://appengine.google.com/permissions?app_id=" + app);
-		rs += app + "<br>";
-	});
-	document.getElementById("apptable").innerHTML=rs;
-	// chrome.windows.create({focused:false,url:urls},closeWindowTabs);
-	openWindowTabs(urls);
-}
-
-function openWindowDeleteUser(appArray,userToDelete) {
-	var rs, urls;
-
-	rs = "<H1>Applications do delete user from</H1><P>";
-	urls = [];
-
-	appArray.forEach(function(app){
-		urls.push(
-			"https://appengine.google.com/permissions?app_id=" + encodeURIComponent(app) + 
-			"&rp-user-delete=" + encodeURIComponent(userToDelete));
-		rs += app + "<br>";
-	});
-	document.getElementById("apptable").innerHTML=rs;
-	// chrome.windows.create({focused:false,url:urls});
-	openWindowTabs(urls);
-}
-
-function openWindowAddUser(appHash,userToAdd) {
-	var rs, urls;
-
-	rs = "<H1>Applications do add user to</H1><P>";
-	urls = [];
-
-	console.log("openWindowAddUser: args: " + userToAdd);
-	console.log("openWindowAddUser: args: " + appHash);
-	console.log("openWindowAddUser: args: " + Object.keys(appHash));
-
-	Object.keys(appHash).forEach(function(app) {
-		urls.push(
-			"https://appengine.google.com/permissions?app_id=" + encodeURIComponent(app) + 
-			"&rp-user-add=" + encodeURIComponent(userToAdd + ":" + appHash[app]));
-		rs += app + ":" + appHash[app] + "<BR>";
-	});
-	document.getElementById("apptable").innerHTML=rs;
-	// chrome.windows.create({focused:false,url:urls});
-	openWindowTabs(urls);
-}
 
 
-function openWindowTabs(urlList) {
-	console.log("open window " + urlList);
-	chrome.windows.create({focused:false,url:urlList},closeWindowTabs);
-}
-
-function closeWindowTabs(tabsWindow) {
-	console.log("tabsWindow:" + Object.keys(tabsWindow).toString());
-	displayKnownInfo();
-	window.setTimeout(function(){ chrome.windows.remove(tabsWindow["id"]); },60000);
-}
+// ??? -------------------------------------------------------------------------
 
 function updateInfo() {
 	console.log("send message: clear old user list");
@@ -292,7 +405,7 @@ function updateInfo() {
 	console.log("send message: read list of known apps with callback for scraping");
 	chrome.runtime.sendMessage(
 		{method:'getAppList'}, 
-		openWindowTabsScraper
+		scrapeInfo
 		);
 }
 

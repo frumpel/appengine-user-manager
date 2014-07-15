@@ -1,5 +1,5 @@
-var accessHash = {};
-var appHash = {};
+var accessHash = {}; // key value store: { app: { user: access, ... }, ...}
+var appHash = {};    // key value store" { app: T/F, ... }
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     // user list 
