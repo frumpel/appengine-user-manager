@@ -225,8 +225,8 @@ function fixUser(userToFix) {
 		// console.log("appi.classname: " + appi.className);
 		appn = appi.className.replace(/(ADDUSER|APPSELECTOR|(NON)?PROD)/g,"").replace(userToFix,'').replace(/\s/g,'');
 		// console.log("appn: " + appn)
-		pcur = (typeof(accessHash[appn][userToFix]) == "undefined" ? "UNDEFINED" : accessHash[appn][userToFix]);
-		pnew = (typeof(appi.value                 ) == "undefined" ? "UNDEFINED" : appi.value                 );
+		pcur = (typeof(accessHash[appn][userToFix]["access"]) == "undefined" ? "UNDEFINED" : accessHash[appn][userToFix]);
+		pnew = (typeof(appi.value                           ) == "undefined" ? "UNDEFINED" : appi.value                 );
 
 		console.log("Fix user: " + pcur + " to " + pnew)
 		if (pnew != pcur) {
@@ -340,7 +340,16 @@ function formatUserHash(userHash) {
 
 			// eptr = document.createTextNode(userHash[app][user]);
 
-			eptr = createOwnershipSelector(userHash[app][user]);
+
+			if (userHash[app][user] == undefined) {
+				eptr = createOwnershipSelector(0)
+			}
+			else {
+				eptr = createOwnershipSelector(userHash[app][user]["access"]);
+				if (userHash[app][user]["disabled"]) {
+					eptr.style.backgroundColor = "#CCC";
+				}
+			}
 			eptr.className = user + " " + app + " " + "APPSELECTOR" + " " + appclass;
 
 			tcel.appendChild(eptr);

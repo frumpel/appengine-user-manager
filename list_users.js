@@ -1,5 +1,5 @@
 function ae_p_perms_list_users() {
-    var appnm, table, lines, c, e, user, access;
+    var appnm, table, lines, c, e, user, access, disabled;
 
     console.log(arguments.callee.name);
 
@@ -18,8 +18,14 @@ function ae_p_perms_list_users() {
                         // note: this is an mdash, not a dash!
                         user = e[0].innerHTML.replace(/—.*/,'').replace(/\s/g,'');
                         access = e[1].getElementsByTagName("select")[0].value;
+                        disabled = e[1].getElementsByTagName("select")[0].disabled;
                         console.log(arguments.callee.name + ": " + user);
-                        chrome.runtime.sendMessage({method:'addUser',"user":user,"application":appnm,"access":access});
+                        chrome.runtime.sendMessage({
+                            "method":"addUser",
+                            "user":user,
+                            "application":appnm,
+                            "access":access,
+                            "disabled":disabled});
                     }
                 }
             );
