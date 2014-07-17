@@ -36,3 +36,12 @@ A note on naming conventions / assumptions:
 
 * The highlighting / CSS logic assumes that you have your projects named APPNAME-(...|prod) and you will get different highlights for prod vs non-prod projects
 * There is the assumption that you have preferred email domains. As such there is variable named "okDomains" with list of accepted domains in message_read.js. Season to taste
+
+Bugs / Workarounds
+------------------
+
+If you have lots of apps and thus send lots of invitations, email clients will make a mess of grouping messages. As a result users will likely not accept all invitations. The dashboard now shows the pending invitations but it's not convenient for creating lists. You can do that by running this jq (http://stedolan.github.io/jq/) script against the json blob at the botton. (Yes, I know this would likely be easier as an XPath query directly in the page)
+
+```
+cat JSON | jq '. as $source | (keys | map(select($source[.]."EMAIL".disabled==true)))'
+```
